@@ -126,6 +126,9 @@ void OpenGlWidget::mousePressEvent(QMouseEvent * e) {
         for(size_t i = 0; i < meshes.size(); i++)
         {
             meshes[i]->material.ambient = vec3{ 0.329412f, 0.223529f, 0.027451f };
+            meshes[i]->material.diffuse = vec3{ 0.780392f, 0.568627f, 0.113725f };
+            meshes[i]->material.specular = vec3{ 0.992157f, 0.941176f, 0.807843f };
+            meshes[i]->material.shiness = 24.0f;
         }
         for(int i = 1; i < 20; i++ )
         {
@@ -187,9 +190,9 @@ bool OpenGlWidget::glowObject(vec3 coords)
             pos.y + max.y  >= coords.y &&
             pos.z + max.z  >= coords.z )
         {
-            std::cout << std::endl << std::endl << std::endl << std::endl << i << std::endl << std::endl << std::endl;
-            meshes[i]->material.ambient = vec3{ 0.6f, 0.1f, 0.1f};
-            meshes[i]->material.diffuse = vec3{ 0.2f, 0.2f, 0.1f };
+            meshes[i]->material.ambient = vec3{ 0.5, 0, 0};
+            meshes[i]->material.diffuse = vec3{ 1.0f, 1.0f, 1.0f };
+            meshes[i]->material.specular = vec3{ 0.5, 0.5, 0.5};
             return true;
         }
     }
