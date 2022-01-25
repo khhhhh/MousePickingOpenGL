@@ -45,13 +45,6 @@ void OpenGlWidget::initializeGL() {
     gourardProgram->compileShaderFromFile(":/fshader.fsh", GL_FRAGMENT_SHADER);
     gourardProgram->link();
 
-    /*
-    phongProgram = new GLSLProgram();
-    phongProgram->compileShaderFromFile("phong.vert", GL_VERTEX_SHADER);
-    phongProgram->compileShaderFromFile("phong.fsh", GL_FRAGMENT_SHADER);
-    phongProgram->link();
-    */
-
     program = gourardProgram;
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -59,9 +52,8 @@ void OpenGlWidget::initializeGL() {
     timer.start();
 }
 void OpenGlWidget::paintGL() {
-    // ustawienie koloru tła na biały
     processCamera();
-    glClearColor(1, 1, 1, 1);
+    glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     program->use();
@@ -69,8 +61,6 @@ void OpenGlWidget::paintGL() {
     program->setUniform("ViewMat", camera->matrix());
     program->setUniform("ProjMat", projMat);
     program->setUniform("LightPosition", vec3{0,2,0});
-
-
 
     for(size_t i=0; i<meshes.size(); i++) {
         Mesh *mesh = meshes[i];
@@ -107,6 +97,14 @@ void OpenGlWidget::mousePressEvent(QMouseEvent * e) {
         ax = e->pos().x();
         ay = e->pos().y();
     }else if(e->button() == Qt::RightButton) {
+
+        for(size_t i = 0; i < meshes.size(); i++)
+        {
+            meshes[i]->material.ambient = vec3{ 0.329412f, 0.223529f, 0.027451f };
+            meshes[i]->material.diffuse = vec3{ 0.780392f, 0.568627f, 0.113725f };
+            meshes[i]->material.specular = vec3{ 0.992157f, 0.941176f, 0.807843f };
+        }
+
         float *m = camera->matrix().m;
         glm::mat4 view = { m[0], m[1], m[2], m[3],
                            m[4], m[5], m[6], m[7],
@@ -123,13 +121,6 @@ void OpenGlWidget::mousePressEvent(QMouseEvent * e) {
         glm::vec3 wincoord = glm::vec3(ax, winHeight - ay, -0.1f);
         glm::vec3 objcoord = glm::unProject(wincoord, view, projection, viewport);
         vec3 pos = {objcoord.x, objcoord.y, objcoord.z};
-        for(size_t i = 0; i < meshes.size(); i++)
-        {
-            meshes[i]->material.ambient = vec3{ 0.329412f, 0.223529f, 0.027451f };
-            meshes[i]->material.diffuse = vec3{ 0.780392f, 0.568627f, 0.113725f };
-            meshes[i]->material.specular = vec3{ 0.992157f, 0.941176f, 0.807843f };
-            meshes[i]->material.shiness = 24.0f;
-        }
         for(int i = 1; i < 20; i++ )
         {
             pos =  normal(pos - camera->pos) * i + camera->pos;
