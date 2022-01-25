@@ -47,6 +47,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void mousePicking(float ax, float ay);
 
 public:
     std::set<int> keys;

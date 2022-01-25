@@ -91,42 +91,11 @@ void OpenGlWidget::keyReleaseEvent(QKeyEvent *event) {
 }
 
 void OpenGlWidget::mousePressEvent(QMouseEvent * e) {
-    ax = e->pos().x();
-    ay = e->pos().y();
     if(e->button() == Qt::LeftButton){
         ax = e->pos().x();
         ay = e->pos().y();
     }else if(e->button() == Qt::RightButton) {
-
-        for(size_t i = 0; i < meshes.size(); i++)
-        {
-            meshes[i]->material.ambient = vec3{ 0.329412f, 0.223529f, 0.027451f };
-            meshes[i]->material.diffuse = vec3{ 0.780392f, 0.568627f, 0.113725f };
-            meshes[i]->material.specular = vec3{ 0.992157f, 0.941176f, 0.807843f };
-        }
-
-        float *m = camera->matrix().m;
-        glm::mat4 view = { m[0], m[1], m[2], m[3],
-                           m[4], m[5], m[6], m[7],
-                           m[8], m[9], m[10], m[11],
-                           m[12], m[13], m[14], m[15]
-                };
-        m = projMat.m;
-        glm::mat4 projection = { m[0], m[1], m[2], m[3],
-                           m[4], m[5], m[6], m[7],
-                           m[8], m[9], m[10], m[11],
-                           m[12], m[13], m[14], m[15]
-                };
-        glm::vec4 viewport = glm::vec4(0, 0, winWidth, winHeight);
-        glm::vec3 wincoord = glm::vec3(ax, winHeight - ay, -0.1f);
-        glm::vec3 objcoord = glm::unProject(wincoord, view, projection, viewport);
-        vec3 pos = {objcoord.x, objcoord.y, objcoord.z};
-        for(int i = 1; i < 20; i++ )
-        {
-            pos =  normal(pos - camera->pos) * i + camera->pos;
-            if(glowObject(pos))
-                break;
-        }
+        mousePicking(e->pos().x(), e->pos().y());
     }
 }
 
@@ -138,6 +107,42 @@ void OpenGlWidget::mouseMoveEvent(QMouseEvent * e) {
         ax = e->pos().x();
         ay = e->pos().y();
     }
+}
+
+void OpenGlWidget::mousePicking(float ax, float ay)
+{
+        for(size_t i = 0; i < meshes.size(); i++)
+        {
+            meshes[i]->material.ambient = vec3{ 0.329412f, 0.223529f, 0.027451f };
+            meshes[i]->material.diffuse = vec3{ 0.780392f, 0.568627f, 0.113725f };
+            meshes[i]->material.specular = vec3{ 0.992157f, 0.941176f, 0.807843f };
+        }
+        float *m = camera->matrix().m;
+        glm::mat4 view =
+            { m[0], m[1], m[2], m[3],
+              m[4], m[5], m[6], m[7],
+              m[8], m[9], m[10], m[11],
+              m[12], m[13], m[14], m[15] };
+
+        m = projMat.m;
+
+        glm::mat4 projection =
+            { m[0], m[1], m[2], m[3],
+              m[4], m[5], m[6], m[7],
+              m[8], m[9], m[10], m[11],
+              m[12], m[13], m[14], m[15] };
+
+        glm::vec4 viewport = glm::vec4(0, 0, winWidth, winHeight);
+        glm::vec3 wincoord = glm::vec3(ax, winHeight - ay, 0.1f);
+        glm::vec3 objcoord = glm::unProject(wincoord, view, projection, viewport);
+
+        vec3 pos = {objcoord.x, objcoord.y, objcoord.z};
+        for(int i = 1; i < 20; i++ )
+        {
+            pos =  normal(pos - camera->pos) * i + camera->pos;
+            if(glowObject(pos))
+                break;
+        }
 }
 
 void OpenGlWidget::processCamera() {
